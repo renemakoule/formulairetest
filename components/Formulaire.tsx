@@ -1,4 +1,4 @@
-'use client'
+'use client';
 /* eslint-disable react/no-unescaped-entities */
 // components/Formulaire.tsx
 import { useState, useRef, useEffect } from "react";
@@ -7,8 +7,8 @@ import { FileUpload } from "./ui/file-upload";
 const Formulaire: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRefSmallScreen = useRef<HTMLVideoElement>(null);
+  const videoRefLargeScreen = useRef<HTMLVideoElement>(null);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -17,9 +17,13 @@ const Formulaire: React.FC = () => {
       const previewURL = URL.createObjectURL(file);
       setVideoPreview(previewURL);
       setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.src = previewURL;
-          videoRef.current.play();
+        if (videoRefSmallScreen.current) {
+          videoRefSmallScreen.current.src = previewURL;
+          videoRefSmallScreen.current.play();
+        }
+        if (videoRefLargeScreen.current) {
+          videoRefLargeScreen.current.src = previewURL;
+          videoRefLargeScreen.current.play();
         }
       }, 0);
     } else {
@@ -27,9 +31,22 @@ const Formulaire: React.FC = () => {
     }
   };
 
+  const synchronizePlayPause = (sourceRef: React.RefObject<HTMLVideoElement>, targetRef: React.RefObject<HTMLVideoElement>) => {
+    if (!sourceRef.current || !targetRef.current) return;
+
+    // Synchronize play and pause between video elements
+    sourceRef.current.onplay = () => {
+      targetRef.current?.play();
+    };
+    sourceRef.current.onpause = () => {
+      targetRef.current?.pause();
+    };
+  };
+
   useEffect(() => {
-    if (videoRef.current && videoPreview) {
-      videoRef.current.play();
+    if (videoPreview) {
+      synchronizePlayPause(videoRefSmallScreen, videoRefLargeScreen);
+      synchronizePlayPause(videoRefLargeScreen, videoRefSmallScreen);
     }
   }, [videoPreview]);
 
@@ -116,7 +133,7 @@ const Formulaire: React.FC = () => {
             <div className="block lg:hidden mb-4">
               <label className="block mb-2">Video Preview</label>
               <video
-                ref={videoRef}
+                ref={videoRefSmallScreen}
                 className="w-full border rounded-xl"
                 controls
                 autoPlay
@@ -149,7 +166,7 @@ const Formulaire: React.FC = () => {
           <div className="hidden lg:block mt-8">
             <label className="block mb-2">Video Preview</label>
             <video
-              ref={videoRef}
+              ref={videoRefLargeScreen}
               className="w-full border rounded-xl"
               controls
               autoPlay
