@@ -167,7 +167,7 @@ const Formulaire: React.FC = () => {
             <label className="block mb-2">Video Preview</label>
             <video
               ref={videoRefLargeScreen}
-              className="w-[655px] border rounded-xl"
+              className="w-[500px] h-[250px] border rounded-xl"
               controls
               autoPlay
               loop
