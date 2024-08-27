@@ -115,7 +115,7 @@ const Formulaire: React.FC = () => {
           placeholder="Enter your username"
           {...register("username")}
         />
-        {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
+        {errors.username && <p className="text-red-500 text-sm">{errors.username.message as React.ReactNode}</p>}
       </div>
 
       <div className="mb-4">
@@ -129,7 +129,7 @@ const Formulaire: React.FC = () => {
           placeholder="Enter the URL of your social networks"
           {...register("url")}
         />
-        {errors.url && <p className="text-red-500 text-sm">{errors.url.message}</p>}
+        {errors.url && <p className="text-red-500 text-sm">{errors.url.message as React.ReactNode}</p>}
       </div>
 
       <div className="mb-4">
@@ -143,7 +143,7 @@ const Formulaire: React.FC = () => {
           {...register("description")}
         />
         {errors.description && (
-          <p className="text-red-500 text-sm">{errors.description.message}</p>
+          <p className="text-red-500 text-sm">{errors.description.message as React.ReactNode}</p>
         )}
       </div>
 
@@ -179,7 +179,7 @@ const Formulaire: React.FC = () => {
           )}
           {file && <p className="text-gray-600">{file.name}</p>}
         </div>
-        {errors.file && <p className="text-red-500 text-sm">{errors.file.message}</p>}
+        {errors.file && <p className="text-red-500 text-sm">{errors.file.message as React.ReactNode}</p>}
         
         {videoPreview && (
           <div className="block lg:hidden mb-4 mt-4">
