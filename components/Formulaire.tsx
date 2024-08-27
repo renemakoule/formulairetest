@@ -1,14 +1,13 @@
-'use client';
+'use client'
 /* eslint-disable react/no-unescaped-entities */
-// components/Formulaire.tsx
-import { useState, useRef, useEffect } from "react";
-import { FileUpload } from "./ui/file-upload";
-import { BackgroundGradient } from "./ui/background-gradient";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "./ui/button";
+import { FileUpload } from "./ui/file-upload";
+import { BackgroundGradient } from "./ui/background-gradient";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 // Schéma de validation Zod
 const formulaireSchema = z.object({
@@ -36,6 +35,16 @@ const Formulaire: React.FC = () => {
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const videoRefSmallScreen = useRef<HTMLVideoElement>(null);
   const videoRefLargeScreen = useRef<HTMLVideoElement>(null);
+  const { toast } = useToast();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm({
+    resolver: zodResolver(formulaireSchema),
+  });
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -77,12 +86,25 @@ const Formulaire: React.FC = () => {
     }
   }, [videoPreview]);
 
+  const onSubmit = (data: any) => {
+    toast({
+      title: "Success",
+      description: "Form submitted successfully",
+    });
+    console.log("Form data:", data);
+  };
+
   return (
     <div className="flex flex-col lg:flex-row justify-center bg-gray-50 min-h-screen p-4">
-      <div className="order-2 lg:order-1 bg-white shadow-md rounded-lg p-8 w-full h-full lg:w-3/4 lg:ml-8 mt-8 lg:mt-0 max-w-3xl">
-        <h1 className="text-2xl font-semibold mb-6">Formulaire d'enregistrement de nouveaux clients</h1>
-        <form className="h-full lg:max-h-[80vh] lg:overflow-y-auto overflow-hidden" onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4">
+  <div className="order-2 lg:order-1 bg-white shadow-md rounded-lg p-8 w-full h-full lg:w-3/4 lg:ml-8 mt-8 lg:mt-0 max-w-3xl">
+    <h1 className="text-2xl font-semibold mb-6">
+      Formulaire d'enregistrement de nouveaux clients
+    </h1>
+    <form
+      className="h-full lg:max-h-[80vh] lg:overflow-y-auto overflow-hidden"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
           Username <span className="text-red-500">*</span>
         </label>
@@ -94,9 +116,9 @@ const Formulaire: React.FC = () => {
           {...register("username")}
         />
         {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
-       </div>
+      </div>
 
-          <div className="mb-4">
+      <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="url">
           URL <span className="text-red-500">*</span>
         </label>
@@ -108,9 +130,9 @@ const Formulaire: React.FC = () => {
           {...register("url")}
         />
         {errors.url && <p className="text-red-500 text-sm">{errors.url.message}</p>}
-         </div>
+      </div>
 
-          <div className="mb-4">
+      <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
           Describe yourself in a few words <span className="text-red-500">*</span>
         </label>
@@ -123,10 +145,9 @@ const Formulaire: React.FC = () => {
         {errors.description && (
           <p className="text-red-500 text-sm">{errors.description.message}</p>
         )}
-        </div>
+      </div>
 
-          {/* Upload video */}
-         <div className="mb-4">
+      <div className="mb-4">
         <label className="block mb-2 text-xl font-semibold">Upload a Welcome Video</label>
         <div
           className="relative flex items-center justify-center w-full h-28 p-10 border-2 border-dashed rounded-lg cursor-pointer bg-gradient-to-r from-pink-200 via-white to-cyan-200 animate-gradient-x"
@@ -159,37 +180,35 @@ const Formulaire: React.FC = () => {
           {file && <p className="text-gray-600">{file.name}</p>}
         </div>
         {errors.file && <p className="text-red-500 text-sm">{errors.file.message}</p>}
-        {/* Render the video preview below the file upload for small screens */}
-          {videoPreview && (
-            <div className="block lg:hidden mb-4">
-              <label className="block mb-2">Video Preview</label>
-              <video
-                ref={videoRefSmallScreen}
-                className="w-full border rounded-xl"
-                controls
-                autoPlay
-                loop
-              >
-                <source src={videoPreview} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          )}
         
+        {videoPreview && (
+          <div className="block lg:hidden mb-4 mt-4">
+            <label className="block mb-2">Video Preview</label>
+            <video
+              ref={videoRefSmallScreen}
+              className="w-full border rounded-xl"
+              controls
+              autoPlay
+              loop
+            >
+              <source src={videoPreview} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        )}
       </div>
-          <div className="mb-4">
+
+      <div className="mb-4">
       <label className="block mb-2 text-xl font-semibold">Upload your file PDF</label>
         <FileUpload />
       </div>
 
       <Button type="submit">Submit</Button>
+    </form>
+  </div>
 
-        </form>
-      </div>
-
-      <div className="order-1 lg:order-2 w-full lg:w-1/4 lg:ml-8 lg:mt-0">
-
-        <BackgroundGradient>
+  <div className="order-1 lg:order-2 w-full lg:w-1/4 lg:ml-8 lg:mt-0">
+    <BackgroundGradient>
       <div className="bg-white shadow-md rounded-lg p-8 w-full">
         <label className="block mb-2 text-center font-semibold">Simple video welcome</label>
         <video
@@ -202,28 +221,26 @@ const Formulaire: React.FC = () => {
       </div>
     </BackgroundGradient>
 
-        {/* Render the video preview below "Utiliser le modèle" button for larger screens */}
-        {videoPreview && (
-          <div className="hidden lg:block mt-8">
-            <BackgroundGradient>
+    {videoPreview && (
+      <div className="hidden lg:block mt-8">
+        <BackgroundGradient>
           <div className="bg-white shadow-md rounded-lg p-8 w-full">
           <label className="block mb-2 text-center font-semibold">Video Preview</label>
-            <video
-              ref={videoRefLargeScreen}
-              className="w-[500px] h-[250px] border rounded-xl"
-              controls
-              autoPlay
-              loop
-            >
-              <source src={videoPreview} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-            </div>
-        </BackgroundGradient>
-          </div>
-        )}
+        <video
+          ref={videoRefLargeScreen}
+          className="w-full h-full object-cover rounded-xl"
+          autoPlay
+          loop
+          controls
+          src={videoPreview}
+        ></video>
       </div>
-    </div>
+        </BackgroundGradient>
+      </div>
+    )}
+  </div>
+</div>
+
   );
 };
 
